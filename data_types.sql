@@ -107,5 +107,221 @@ mysql> select * from people;
 +-------+------------+-----------+---------------------+
 
 ⭐️⭐️⭐️ CURDATE(), CURTIME(), NOW() 
+mysql> select curdate();
++------------+
+| curdate()  |
++------------+
+| 2020-05-30 |
++------------+
 
- 
+mysql> select curtime();
++-----------+
+| curtime() |
++-----------+
+| 17:58:34  |
++-----------+
+
+ mysql> select now();
++---------------------+
+| now()               |
++---------------------+
+| 2020-05-30 17:58:38 |
++---------------------+
+1 row in set (0.00 sec)
+
+mysql> INSERT INTO people (name, birthdate, birthtime, birthdt) VALUES ('Microwave', CURDATE(), CURTIME(), NOW());
+
+mysql> select * from people;
++-----------+------------+-----------+---------------------+
+| name      | birthdate  | birthtime | birthdt             |
++-----------+------------+-----------+---------------------+
+| padma     | 1983-11-11 | 10:07:35  | 1983-11-11 10:07:35 |
+| Larry     | 1943-12-25 | 04:10:42  | 1943-12-25 04:10:42 |
+| Microwave | 2020-05-30 | 18:04:59  | 2020-05-30 18:04:59 | ⭐️⭐️⭐️
++-----------+------------+-----------+---------------------+
+3 rows in set (0.00 sec)
+
+# ⭐️⭐️⭐️ Formatting DATES (and times);
+- ⭐️ DAY()
+mysql> select name, DAY(birthdate) FROM people;
++-----------+----------------+
+| name      | DAY(birthdate) |
++-----------+----------------+
+| padma     |             11 |
+| Larry     |             25 |
+| Microwave |             30 |
++-----------+----------------+
+
+- ⭐️ DAYNAME()
+mysql> SELECT name, birthdate, DAYNAME(birthdate) FROM people;
++-----------+------------+--------------------+
+| name      | birthdate  | DAYNAME(birthdate) |
++-----------+------------+--------------------+
+| padma     | 1983-11-11 | Friday             |
+| Larry     | 1943-12-25 | Saturday           |
+| Microwave | 2020-05-30 | Saturday           |
++-----------+------------+--------------------+
+
+- ⭐️ DAYOFWEEK()
+mysql> SELECT name, birthdate, DAYOFWEEK(birthdate) FROM people;
++-----------+------------+----------------------+
+| name      | birthdate  | DAYOFWEEK(birthdate) |
++-----------+------------+----------------------+
+| padma     | 1983-11-11 |                    6 |
+| Larry     | 1943-12-25 |                    7 |
+| Microwave | 2020-05-30 |                    7 |
++-----------+------------+----------------------+
+
+- ⭐️ DAYOFYEAR()
+mysql> SELECT name, birthdate, DAYOFYEAR(birthdate) FROM people;
++-----------+------------+----------------------+
+| name      | birthdate  | DAYOFYEAR(birthdate) |
++-----------+------------+----------------------+
+| padma     | 1983-11-11 |                  315 |
+| Larry     | 1943-12-25 |                  359 |
+| Microwave | 2020-05-30 |                  151 |
++-----------+------------+----------------------+
+
+mysql> SELECT CONCAT(MONTHNAME(birthdate), ' ', DAY(birthdate), ' ', YEAR(birthdate)) FROM people;
++-------------------------------------------------------------------------+
+| CONCAT(MONTHNAME(birthdate), ' ', DAY(birthdate), ' ', YEAR(birthdate)) |
++-------------------------------------------------------------------------+
+| November 11 1983                                                        |
+| December 25 1943                                                        |
+| May 30 2020                                                             |
++-------------------------------------------------------------------------+
+3 rows in set (0.05 sec)
+
+- ⭐️ DATE_FORMAT
+mysql> SELECT DATE_FORMAT(birthdt, '%m/%d/%Y') FROM people;
++----------------------------------+
+| DATE_FORMAT(birthdt, '%m/%d/%Y') |
++----------------------------------+
+| 11/11/1983                       |
+| 12/25/1943                       |
+| 05/30/2020                       |
++----------------------------------+
+
+3 rows in set (0.00 sec)
+mysql> SELECT DATE_FORMAT(birthdt, '%m/%d/%Y at %h:%i') FROM people;
++-------------------------------------------+
+| DATE_FORMAT(birthdt, '%m/%d/%Y at %h:%i') |
++-------------------------------------------+
+| 11/11/1983 at 10:07                       |
+| 12/25/1943 at 04:10                       |
+| 05/30/2020 at 06:04                       |
++-------------------------------------------+
+3 rows in set (0.00 sec)
+
+
+# ⭐️⭐️⭐️ DATE MATH 
+- ⭐️ DATEDIFF
+mysql> SELECT DATEDIFF(NOW(), birthdate) FROM people;
++----------------------------+
+| DATEDIFF(NOW(), birthdate) |
++----------------------------+
+|                      13350 |
+|                      27916 |
+|                          0 |
++----------------------------+
+3 rows in set (0.00 sec)
+
+mysql> SELECT birthdt, DATE_ADD(birthdt, INTERVAL 1 MONTH) FROM people;
++---------------------+-------------------------------------+
+| birthdt             | DATE_ADD(birthdt, INTERVAL 1 MONTH) |
++---------------------+-------------------------------------+
+| 1983-11-11 10:07:35 | 1983-12-11 10:07:35                 |
+| 1943-12-25 04:10:42 | 1944-01-25 04:10:42                 |
+| 2020-05-30 18:04:59 | 2020-06-30 18:04:59                 |
++---------------------+-------------------------------------+
+
+mysql> SELECT birthdt, birthdt + INTERVAL 1 MONTH FROM people;
++---------------------+----------------------------+
+| birthdt             | birthdt + INTERVAL 1 MONTH |
++---------------------+----------------------------+
+| 1983-11-11 10:07:35 | 1983-12-11 10:07:35        |
+| 1943-12-25 04:10:42 | 1944-01-25 04:10:42        |
+| 2020-05-30 18:04:59 | 2020-06-30 18:04:59        |
++---------------------+----------------------------+
+3 rows in set (0.00 sec)
+
+mysql> SELECT birthdt, birthdt + INTERVAL 15 MONTH + INTERVAL 10 HOUR FROM people;
++---------------------+------------------------------------------------+
+| birthdt             | birthdt + INTERVAL 15 MONTH + INTERVAL 10 HOUR |
++---------------------+------------------------------------------------+
+| 1983-11-11 10:07:35 | 1985-02-11 20:07:35                            |
+| 1943-12-25 04:10:42 | 1945-03-25 14:10:42                            |
+| 2020-05-30 18:04:59 | 2021-08-31 04:04:59                            |
++---------------------+------------------------------------------------+
+3 rows in set (0.00 sec)
+
+
+# ⭐️⭐️⭐️ TIMESTAMPS ⭐️⭐️⭐️
+- DATETIME VS TIMESTAMPS
+CREATE TABLE comments (
+	content VARCHAR(100), 
+	created_at TIMESTAMP DEFAULT NOW()
+);
+
+mysql> INSERT INTO comments (content) VALUES('lol what a funny article');
+mysql> INSERT INTO comments (content) VALUES('I found this offensive');
+mysql> INSERT INTO comments (content) VALUES('Ifasfsadfsadfsad');
+
+mysql> select * from comments;
++--------------------------+---------------------+
+| content                  | created_at          |
++--------------------------+---------------------+
+| lol what a funny article | 2020-05-30 18:40:08 |
+| I found this offensive   | 2020-05-30 18:40:18 |
+| Ifasfsadfsadfsad         | 2020-05-30 18:40:58 |
++--------------------------+---------------------+
+
+
+# ⭐️⭐️⭐️ TIMESTAMPS ⭐️⭐️⭐️
+CREATE TABLE comments3 (
+    content VARCHAR(100),
+    changed_at TIMESTAMP DEFAULT NOW() ON UPDATE CURRENT_TIMESTAMP
+);
+INSERT INTO comments3 (content) VALUES('dasdasdasd');
+INSERT INTO comments3 (content) VALUES('lololololo');
+INSERT INTO comments3 (content) VALUES('I LIKE CATS AND DOGS');
+
+mysql> select * from comments3;
++----------------------+---------------------+
+| content              | changed_at          |
++----------------------+---------------------+
+| dasdasdasd           | 2020-05-30 18:50:00 |
+| lololololo           | 2020-05-30 18:50:00 |
+| I LIKE CATS AND DOGS | 2020-05-30 18:50:02 |
++----------------------+---------------------+
+3 rows in set (0.00 sec)
+
+UPDATE comments3 SET content='THIS IS NOT GIBBERISH' WHERE content='dasdasdasd';
+
+mysql> select * from comments3;
++-----------------------+---------------------+
+| content               | changed_at          |
++-----------------------+---------------------+
+| THIS IS NOT GIBBERISH | 2020-05-30 18:55:44 |
+| lololololo            | 2020-05-30 18:50:00 |
+| I LIKE CATS AND DOGS  | 2020-05-30 18:50:02 |
++-----------------------+---------------------+
+3 rows in set (0.00 sec)
+
+# If you want to select people whose birthdate is between 1980 - 2000;
+# 1st approach 
+mysql> SELECT name, birthdt from people WHERE birthdt BETWEEN '1980-01-01' AND '2000-01-01';
++-------+---------------------+
+| name  | birthdt             |
++-------+---------------------+
+| padma | 1983-11-11 10:07:35 |
++-------+---------------------+
+
+# ⭐️⭐️ 2nd approach (better approach)
+mysql> SELECT name, birthdt from people WHERE birthdt BETWEEN CAST('1980-01-01' AS DATETIME) AND CAST('2000-01-01' AS DATETIME);
++-------+---------------------+
+| name  | birthdt             |
++-------+---------------------+
+| padma | 1983-11-11 10:07:35 |
++-------+---------------------+
+
